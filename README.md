@@ -15,6 +15,13 @@ no Mac hardware and no Apple Developer licence.
 | `templates/macos-e2e-proof.yml` | A copy-in, **manually dispatched** end-to-end proof for macOS: builds natively on a real Apple Silicon runner, runs your repo's `scripts/macos-e2e.sh`, and uploads the session logs as an artifact. |
 | `examples/aishell-macos-e2e.yml` | The proven instance this kit was distilled from — aishell's live workflow, kept verbatim as the reference implementation (it also lives on aishell's `main`). |
 
+## Getting started
+
+Two ways in, both detailed below: call the reusable workflow from your repo
+(`uses: nrupala/platform-ci-scaffolding/.github/workflows/reusable-build-test.yml@v1`
+with your build and test commands), or copy a template into your repo's
+`.github/workflows/`. No installation step — GitHub Actions runs everything.
+
 ## Use the reusable workflow (no copying)
 
 In any repo, add a caller workflow:
@@ -90,6 +97,10 @@ scaffolding is proven, not just stored.
 ## Licence
 
 Apache-2.0, © 2351485 ALBERTA INC. Use it in every repo we own.
+
+## Security
+
+See `SECURITY.md` for how to report a vulnerability privately.
 
 ## Scope boundary (owner's ruling, 2026-11-05)
 
