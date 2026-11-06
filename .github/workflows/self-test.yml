@@ -1,0 +1,14 @@
+name: Self-test (reusable workflow)
+
+# Proves the reusable build/test workflow in this repo actually runs on
+# all three platforms. Dispatch manually after changing it.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  platform:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      build-command: "echo BUILD_OK && uname -a"
+      test-command: "echo TEST_OK"
