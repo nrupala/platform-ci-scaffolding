@@ -72,6 +72,13 @@ portable, or move OS-specific logic into a script in your repo and call that.
 - **Hosted minutes are a real budget** on this account (the macOS multiplier
   is 10x). Proofs are occasional and deliberate, not per-commit.
 
+## Self-proof
+
+`.github/workflows/self-test.yml` (dispatch-only) calls the reusable
+workflow with trivial build/test commands. First run **42154594890 —
+completed/success on all three OS legs** (2026-11-05), so the
+scaffolding is proven, not just stored.
+
 ## Provenance
 
 - Distilled from `nrupala/aishell` (`.github/workflows/macos-e2e.yml`,
