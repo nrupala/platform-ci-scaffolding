@@ -1,0 +1,73 @@
+name: Reusable Build+Test (all platforms)
+
+# Reusable cross-platform build+test matrix for our repos.
+# Call it from any repo:
+#
+#   jobs:
+#     platform:
+#       uses: nrupala/platform-ci-scaffolding/.github/workflows/reusable-build-test.yml@v1
+#       with:
+#         build-command: "go build ./..."
+#         test-command: "go test ./..."
+#
+# Lessons baked in (see the repo README): macos-14 jobs are cancelled
+# instantly on this account — macos-15 is the working Apple Silicon label.
+# Commands run under bash on every OS (Git Bash on Windows).
+
+on:
+  workflow_call:
+    inputs:
+      setup-command:
+        description: "Optional command run before build on every OS"
+        type: string
+        required: false
+        default: ""
+      build-command:
+        description: "Build command (bash syntax)"
+        type: string
+        required: true
+      test-command:
+        description: "Test command (bash syntax)"
+        type: string
+        required: true
+      go-version:
+        description: "If set, actions/setup-go runs with this version first"
+        type: string
+        required: false
+        default: ""
+      working-directory:
+        description: "Directory to run the commands in"
+        type: string
+        required: false
+        default: "."
+
+jobs:
+  build-test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-15]
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        if: ${{ inputs.go-version != '' }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.go-version }}
+
+      - name: Setup
+        if: ${{ inputs.setup-command != '' }}
+        run: ${{ inputs.setup-command }}
+
+      - name: Build
+        run: ${{ inputs.build-command }}
+
+      - name: Test
+        run: ${{ inputs.test-command }}

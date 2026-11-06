@@ -1,0 +1,44 @@
+name: CI (all platforms)
+
+# TEMPLATE — copy into your repo's .github/workflows/ and set the two
+# commands (or replace the steps with your stack's setup actions).
+# Source: nrupala/platform-ci-scaffolding (see its README for the lessons).
+#
+# macos-14 jobs are cancelled instantly on this account — macos-15 is the
+# working Apple Silicon label. Commands run under bash on every OS
+# (Git Bash on Windows); keep them portable or delegate to repo scripts.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  BUILD_COMMAND: "echo TODO: set your build command"
+  TEST_COMMAND: "echo TODO: set your test command"
+
+jobs:
+  build-test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+
+      # Add your toolchain setup here, e.g.:
+      # - uses: actions/setup-go@v5
+      #   with: { go-version: "1.23" }
+      # - uses: actions/setup-node@v4
+      #   with: { node-version: "20" }
+
+      - name: Build
+        shell: bash
+        run: ${{ env.BUILD_COMMAND }}
+
+      - name: Test
+        shell: bash
+        run: ${{ env.TEST_COMMAND }}

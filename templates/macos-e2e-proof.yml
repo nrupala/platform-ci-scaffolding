@@ -1,0 +1,65 @@
+name: macOS E2E Proof
+
+# TEMPLATE — copy into your repo's .github/workflows/, set the env values
+# below, and give your repo a scripts/macos-e2e.sh that runs the real
+# product end-to-end (asserting, not just running) and writes transcripts
+# into e2e-logs/.
+# Source: nrupala/platform-ci-scaffolding — distilled from aishell's proven
+# certification workflow (examples/aishell-macos-e2e.yml there).
+#
+# This proves your software genuinely executes on macOS — a GitHub-hosted
+# macos-15 runner is a real Apple Silicon Mac, and no Apple Developer
+# licence is needed to run a standalone binary (the licence gates
+# notarization/App Store distribution, not execution).
+#
+# Lessons baked in:
+# - macos-14 jobs are cancelled ~1s after creation on this account;
+#   macos-13 only queues. macos-15 is the working label.
+# - Dispatch-only: a real E2E run can take ~15 min at a 10x minute
+#   multiplier. Never put this on push/PR triggers.
+# - Later steps carry `if: always()` so one failure doesn't hide the
+#   evidence of the legs that didn't run; transcripts upload either way.
+
+on:
+  workflow_dispatch:
+
+env:
+  # TODO: your dependency install, e.g. "brew install llama.cpp"
+  DEPS_COMMAND: "echo TODO: install runtime dependencies"
+  # TODO: your setup, e.g. "./setup.sh" (downloads, fixtures, models)
+  SETUP_COMMAND: "echo TODO: run product setup"
+  # TODO: your native build, e.g. "go build -o app ."
+  BUILD_COMMAND: "echo TODO: build the product natively"
+
+jobs:
+  macos-e2e:
+    name: macos-e2e
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      # Add your toolchain setup here, e.g.:
+      # - uses: actions/setup-go@v5
+      #   with: { go-version: "1.23" }
+
+      - name: Install dependencies
+        run: ${{ env.DEPS_COMMAND }}
+
+      - name: Build (native arm64)
+        run: ${{ env.BUILD_COMMAND }}
+
+      - name: Setup
+        run: ${{ env.SETUP_COMMAND }}
+
+      - name: E2E suite (scripts/macos-e2e.sh)
+        run: |
+          mkdir -p e2e-logs
+          bash scripts/macos-e2e.sh 2>&1 | tee e2e-logs/suite.log
+
+      - name: Upload session transcripts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-e2e-logs
+          path: e2e-logs/
+          if-no-files-found: warn
