@@ -6,6 +6,9 @@ name: Self-test (reusable workflow)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   platform:
     uses: ./.github/workflows/reusable-build-test.yml
