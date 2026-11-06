@@ -90,3 +90,18 @@ scaffolding is proven, not just stored.
 ## Licence
 
 Apache-2.0, © 2351485 ALBERTA INC. Use it in every repo we own.
+
+## Scope boundary (owner's ruling, 2026-11-05)
+
+This repo is **public on purpose** and holds only generic, reusable
+platform scaffolding. The fleet's operational workflows — the blog
+automation (queue fillers, scheduled publishers/runners for the
+aimlds.org blog, onsmartgrid, solvedbystats, Think With Finance) and
+the APK release builds (vault-tracker, codetopo, and the other apps)
+— **do not live here**. Those encode how our products operate, so
+they stay in their own private repos where they are. Do not copy
+them into this repo, sanitized or otherwise; if a pattern in one of
+them is ever worth generalizing, that generalization is a separate,
+owner-approved act. Internal addresses and host topology are never
+committed anywhere — they belong in variables and secrets, not in
+workflow text.
