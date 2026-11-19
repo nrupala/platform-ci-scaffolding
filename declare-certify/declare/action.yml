@@ -1,0 +1,65 @@
+name: Declare a release (declare-certify)
+description: >-
+  Open a declare-certify declaration for a release and upload the
+  declaration record as a workflow artifact, so later jobs can certify
+  against it. Declare refuses (and the job fails) when the gate-verdict
+  file is not on disk: no verdict, no release.
+
+inputs:
+  target:
+    description: "What is being released (product / component name)"
+    required: true
+  version:
+    description: "Version being released (e.g. the tag name)"
+    required: true
+  base:
+    description: "Base the release is built from (e.g. the commit SHA)"
+    required: true
+  gate-verdict:
+    description: "Path (in the caller's workspace) to the gate-verdict file authorising this release"
+    required: true
+  declaration-id:
+    description: "Declaration id. Default: <target>-<version>"
+    required: false
+    default: ""
+  artifact-name:
+    description: "Name of the workflow artifact the declaration record is uploaded as"
+    required: false
+    default: "declaration"
+  store-dir:
+    description: "Directory (relative to the workspace) the record is staged in before upload"
+    required: false
+    default: ".declare-certify"
+
+outputs:
+  declaration-id:
+    description: "The declaration id that was opened"
+    value: ${{ steps.declare.outputs.id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Declare
+      id: declare
+      shell: bash
+      env:
+        DECLARE_CERTIFY_DIR: ${{ github.workspace }}/${{ inputs.store-dir }}
+        DC_TARGET: ${{ inputs.target }}
+        DC_VERSION: ${{ inputs.version }}
+        DC_BASE: ${{ inputs.base }}
+        DC_VERDICT: ${{ inputs.gate-verdict }}
+        DC_ID: ${{ inputs.declaration-id }}
+      run: |
+        id="$DC_ID"
+        if [ -z "$id" ]; then id="${DC_TARGET}-${DC_VERSION}"; fi
+        python3 "${{ github.action_path }}/../declare_certify.py" declare \
+          --target "$DC_TARGET" --version "$DC_VERSION" --base "$DC_BASE" \
+          --gate-verdict "$DC_VERDICT" --id "$id"
+        echo "id=$id" >> "$GITHUB_OUTPUT"
+
+    - name: Upload the declaration record as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.store-dir }}
+        if-no-files-found: error

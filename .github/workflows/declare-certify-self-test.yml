@@ -1,0 +1,17 @@
+name: Self-test (declare-certify)
+
+# Proves the declare-certify chain (declare -> artifact -> guard ->
+# certify) with the real module, simulated across two store directories.
+# Dispatch manually after changing anything under declare-certify/.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  chain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the declare-certify chain self-test
+        run: bash declare-certify/self-test.sh

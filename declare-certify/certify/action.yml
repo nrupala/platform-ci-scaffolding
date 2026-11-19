@@ -1,0 +1,60 @@
+name: Certify a release (declare-certify)
+description: >-
+  Download a declaration record uploaded by the declare action, close it
+  with the release evidence, verify it reads CLOSED, and re-upload the
+  closed record as an artifact so a later publish job can guard on it.
+  Certify refuses (and the job fails) without evidence on disk.
+
+inputs:
+  declaration-id:
+    description: "The declaration id opened by the declare action"
+    required: true
+  evidence:
+    description: "Path (in the caller's workspace) to the release evidence file (e.g. artifact hashes, proof log)"
+    required: true
+  note:
+    description: "Optional note recorded on the certification"
+    required: false
+    default: ""
+  artifact-name:
+    description: "Name of the artifact the OPEN declaration record was uploaded as"
+    required: false
+    default: "declaration"
+  closed-artifact-name:
+    description: "Name of the artifact the CLOSED declaration record is uploaded as"
+    required: false
+    default: "declaration-closed"
+  store-dir:
+    description: "Directory (relative to the workspace) the record is staged in"
+    required: false
+    default: ".declare-certify"
+
+runs:
+  using: composite
+  steps:
+    - name: Download the declaration record
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.store-dir }}
+
+    - name: Certify
+      shell: bash
+      env:
+        DECLARE_CERTIFY_DIR: ${{ github.workspace }}/${{ inputs.store-dir }}
+        DC_ID: ${{ inputs.declaration-id }}
+        DC_EVIDENCE: ${{ inputs.evidence }}
+        DC_NOTE: ${{ inputs.note }}
+      run: |
+        args=(--id "$DC_ID" --evidence "$DC_EVIDENCE")
+        if [ -n "$DC_NOTE" ]; then args+=(--note "$DC_NOTE"); fi
+        python3 "${{ github.action_path }}/../declare_certify.py" certify "${args[@]}"
+        # The close must read back CLOSED, or this job fails here.
+        python3 "${{ github.action_path }}/../declare_certify.py" check --id "$DC_ID"
+
+    - name: Upload the closed declaration record as an artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.closed-artifact-name }}
+        path: ${{ inputs.store-dir }}
+        if-no-files-found: error

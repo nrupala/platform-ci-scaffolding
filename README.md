@@ -14,6 +14,7 @@ no Mac hardware and no Apple Developer licence.
 | `templates/multi-platform-ci.yml` | A copy-in CI workflow for repos that prefer to own their file: same three-OS matrix on push/PR. |
 | `templates/macos-e2e-proof.yml` | A copy-in, **manually dispatched** end-to-end proof for macOS: builds natively on a real Apple Silicon runner, runs your repo's `scripts/macos-e2e.sh`, and uploads the session logs as an artifact. |
 | `examples/aishell-macos-e2e.yml` | The proven instance this kit was distilled from — aishell's live workflow, kept verbatim as the reference implementation (it also lives on aishell's `main`). |
+| `declare-certify/` | **Declare → certify for release workflows**: composite actions that open a release declaration in the gate job, carry the record between jobs as an artifact, close it against evidence in the certification job, and fail any publish job while the declaration is still OPEN. See `declare-certify/README.md`. |
 
 ## Getting started
 

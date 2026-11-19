@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Declare-certify kit (`declare-certify/`): composite actions (`declare`, `certify`, `guard`) plus the stdlib-only `declare_certify.py` module — a release is declared in the gate job, the record travels as a workflow artifact, certification closes it against evidence, and a publish job fails while the declaration is OPEN. Proven by `declare-certify/self-test.sh` and the dispatch-only `Self-test (declare-certify)` workflow.
 - `SECURITY.md` (private vulnerability reporting route) and `CONTRIBUTING.md`.
 - CodeQL workflow analysing the repo's GitHub Actions workflows.
 - `TEST-PLAN.md` documenting the self-test as this repo's test evidence.
