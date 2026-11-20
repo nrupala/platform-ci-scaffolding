@@ -58,3 +58,4 @@ runs:
         name: ${{ inputs.closed-artifact-name }}
         path: ${{ inputs.store-dir }}
         if-no-files-found: error
+        include-hidden-files: true
